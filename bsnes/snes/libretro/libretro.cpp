@@ -28,15 +28,24 @@ namespace {
 struct Interface : public SNES::Interface {
   retro_video_refresh_t pvideo_refresh;
   retro_audio_sample_t paudio_sample;
+  retro_audio_sample_batch_t paudio_sample_batch;
   retro_input_poll_t pinput_poll;
   retro_input_state_t pinput_state;
 
   void video_refresh(const uint16_t *data, unsigned width, unsigned height) {
-    if(pvideo_refresh) return pvideo_refresh(data, width, height);
+    if(pvideo_refresh) {
+      unsigned pitch = (height <= 239) ? 1024 : 512;
+      return pvideo_refresh(data, width, height, pitch);
+    }
   }
 
   void audio_sample(uint16_t left, uint16_t right) {
-    if(paudio_sample) return paudio_sample(left, right);
+    if(paudio_sample) {
+      paudio_sample((int16_t)left, (int16_t)right);
+    } else if(paudio_sample_batch) {
+      const int16_t samples[2] = { (int16_t)left, (int16_t)right };
+      paudio_sample_batch(samples, 1);
+    }
   }
 
   void input_poll() {
@@ -48,7 +57,7 @@ struct Interface : public SNES::Interface {
     return 0;
   }
 
-  Interface() : pvideo_refresh(0), paudio_sample(0), pinput_poll(0), pinput_state(0) {
+  Interface() : pvideo_refresh(0), paudio_sample(0), paudio_sample_batch(0), pinput_poll(0), pinput_state(0) {
   }
 };
 
@@ -67,8 +76,7 @@ void retro_set_audio_sample(retro_audio_sample_t audio_sample) {
 }
 
 void retro_set_audio_sample_batch(retro_audio_sample_batch_t audio_sample_batch) {
-  // TODO?
-  (void)audio_sample_batch;
+  interface.paudio_sample_batch = audio_sample_batch;
 }
 
 void retro_set_input_poll(retro_input_poll_t input_poll) {

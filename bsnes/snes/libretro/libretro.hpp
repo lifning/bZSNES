@@ -86,11 +86,11 @@ struct retro_system_av_info
 };
 
 typedef bool (*retro_environment_t)(unsigned cmd, void *data);
-typedef void (*retro_video_refresh_t)(const uint16_t *data, unsigned width, unsigned height);
-typedef void (*retro_audio_sample_t)(uint16_t left, uint16_t right);
+typedef void (*retro_video_refresh_t)(const uint16_t *data, unsigned width, unsigned height, unsigned pitch);
+typedef void (*retro_audio_sample_t)(int16_t left, int16_t right);
 typedef size_t (*retro_audio_sample_batch_t)(const int16_t *data, size_t frames);
 typedef void (*retro_input_poll_t)(void);
-typedef int16_t (*retro_input_state_t)(bool port, unsigned device, unsigned index, unsigned id);
+typedef int16_t (*retro_input_state_t)(unsigned port, unsigned device, unsigned index, unsigned id);
 
 void retro_set_environment(retro_environment_t);
 void retro_set_video_refresh(retro_video_refresh_t);
