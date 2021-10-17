@@ -8,7 +8,10 @@ alwaysinline uint8 SMP::ram_read(uint16 addr) {
 
 alwaysinline void SMP::ram_write(uint16 addr, uint8 data) {
   //writes to $ffc0-$ffff always go to apuram, even if the iplrom is enabled
-  if(status.ram_writable && !status.ram_disabled) memory::apuram[addr] = data;
+  if(status.ram_writable && !status.ram_disabled) {
+    memory::apuram[addr] = data;
+    memory::echoram[addr] = data;
+  }
 }
 
 uint8 SMP::port_read(uint2 port) const {

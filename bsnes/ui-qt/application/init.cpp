@@ -1,8 +1,8 @@
 void Application::init() {
   if(config().system.crashedOnLastRun == true) {
     //emulator crashed on last run, disable all drivers
-    QMessageBox::warning(0, "bsnes Crash Notification", string() <<
-    "<p><b>Warning:</b><br>bsnes crashed while attempting to initialize device "
+    QMessageBox::warning(0, "bZSNES Crash Notification", string() <<
+    "<p><b>Warning:</b><br>bZSNES crashed while attempting to initialize device "
     "drivers the last time it was run.</p>"
     "<p>To prevent this from occurring again, all drivers have been disabled. Please "
     "go to Settings->Configuration->Advanced and choose new driver settings, and then "

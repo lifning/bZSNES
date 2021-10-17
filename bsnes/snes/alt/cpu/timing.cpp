@@ -2,7 +2,7 @@
 
 void CPU::queue_event(unsigned id) {
   switch(id) {
-    case QueueEvent::DramRefresh: return add_clocks(40);
+    case QueueEvent::DramRefresh: return;  //add_clocks(40);
     case QueueEvent::HdmaRun: return hdma_run();
     case QueueEvent::ControllerLatch: return ppu.latch_counters();
   }

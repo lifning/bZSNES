@@ -194,6 +194,7 @@ MainWindow::MainWindow() {
   help = menuBar->addMenu("&Help");
 
   help_documentation = help->addAction("&Documentation ...");
+  help_documentation->setVisible(false);
 
   help_license = help->addAction("&License ...");
 
@@ -615,14 +616,16 @@ void MainWindow::showDocumentation()  {
 }
 
 void MainWindow::showLicense() {
-  QFile file(":/license.html");
-  if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    htmlViewerWindow->show("License Agreement", file.readAll().constData());
-    file.close();
-  }
+  QMessageBox::information(0, "bZSNES License", "bZSNES is licensed under the GNU GPLv2");
+//  QFile file(":/license.html");
+//  if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+//    htmlViewerWindow->show("License Agreement", file.readAll().constData());
+//    file.close();
+//  }
 }
 void MainWindow::showAbout() {
-  aboutWindow->show();
+  QMessageBox::information(0, "About ...", "bZSNES v1.51 ~byuu");
+//aboutWindow->show();
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event) {

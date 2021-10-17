@@ -60,7 +60,7 @@ SettingsWindow::SettingsWindow() {
   advancedArea->setWidgetResizable(true);
 
   tab = new QTabWidget;
-  tab->addTab(profileArea, "Profile");
+//tab->addTab(profileArea, "Profile");
   tab->addTab(videoArea, "Video");
   tab->addTab(audioArea, "Audio");
   tab->addTab(inputArea, "Input");

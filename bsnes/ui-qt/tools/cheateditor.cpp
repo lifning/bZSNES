@@ -170,18 +170,18 @@ void CheatEditorWindow::update() {
     string code = item->text(1).toUtf8().constData();
     string desc = item->text(2).toUtf8().constData();
     if((code != "") || (desc != "")) {
-      item->setForeground(0, QBrush(QColor(0, 0, 0)));
+      //item->setForeground(0, QBrush(QColor(0, 0, 0)));
     } else {
       //highlight empty slots in gray
-      item->setForeground(0, QBrush(QColor(128, 128, 128)));
+      //item->setForeground(0, QBrush(QColor(128, 128, 128)));
     }
     unsigned index = item->data(0, Qt::UserRole).toUInt();
     if(SNES::cheat[index].addr.size() > 0) {
-      item->setForeground(1, QBrush(QColor(0, 0, 0)));
+      //item->setForeground(1, QBrush(QColor(0, 0, 0)));
     } else {
       //highlight invalid codes in red
       //(this will also highlight empty codes, but as there is no text, it's not an issue)
-      item->setForeground(1, QBrush(QColor(255, 0, 0)));
+      //item->setForeground(1, QBrush(QColor(255, 0, 0)));
     }
   }
 }

@@ -103,6 +103,7 @@ namespace memory {
   extern MMIOAccess mmio;   //S-CPU, S-PPU
   extern StaticRAM wram;    //S-CPU
   extern StaticRAM apuram;  //S-SMP, S-DSP
+  extern StaticRAM echoram; //S-DSP
   extern StaticRAM vram;    //S-PPU
   extern StaticRAM oam;     //S-PPU
   extern StaticRAM cgram;   //S-PPU

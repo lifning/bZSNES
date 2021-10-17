@@ -22,32 +22,36 @@ uint16 PPU::get_vram_addr() {
 }
 
 uint8 PPU::vram_read(unsigned addr) {
-  if(regs.display_disable) return memory::vram[addr];
-  if(cpu.vcounter() >= display.height) return memory::vram[addr];
-  return 0x00;
+  return memory::vram[addr];
+//  if(regs.display_disable) return memory::vram[addr];
+//  if(cpu.vcounter() >= display.height) return memory::vram[addr];
+//  return 0x00;
 }
 
 void PPU::vram_write(unsigned addr, uint8 data) {
-  if(regs.display_disable || cpu.vcounter() >= display.height) {
-    memory::vram[addr] = data;
+  memory::vram[addr] = data;
+//  if(regs.display_disable || cpu.vcounter() >= display.height) {
+//    memory::vram[addr] = data;
     cache.tilevalid[0][addr >> 4] = false;
     cache.tilevalid[1][addr >> 5] = false;
     cache.tilevalid[2][addr >> 6] = false;
-    return;
-  }
+//    return;
+//  }
 }
 
 uint8 PPU::oam_read(unsigned addr) {
   if(addr & 0x0200) addr &= 0x021f;
-  if(regs.display_disable) return memory::oam[addr];
-  if(cpu.vcounter() >= display.height) return memory::oam[addr];
-  return memory::oam[0x0218];
+  return memory::oam[addr];
+//  if(regs.display_disable) return memory::oam[addr];
+//  if(cpu.vcounter() >= display.height) return memory::oam[addr];
+//  return memory::oam[0x0218];
 }
 
 void PPU::oam_write(unsigned addr, uint8 data) {
   if(addr & 0x0200) addr &= 0x021f;
-  if(!regs.display_disable && cpu.vcounter() < display.height) addr = 0x0218;
   memory::oam[addr] = data;
+  //if(!regs.display_disable && cpu.vcounter() < display.height) addr = 0x0218;
+  //memory::oam[addr] = data;
   oam.update_list(addr, data);
 }
 

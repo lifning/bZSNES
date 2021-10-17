@@ -61,7 +61,7 @@ void FileBrowser::loadCartridge(CartridgeMode mode, signed filterIndex) {
   << "Game Boy cartridges (*.gb *.sgb *.gbc" << reader.compressionList << ")\n"
   << "All files (*)"
   );
-  previewFrame->show();
+  previewFrame->hide();
   filterBox->setCurrentIndex(filterIndex == -1 ? config().path.current.filter : filterIndex);
   showLoad();
 }

@@ -11,6 +11,7 @@ namespace memory {
   MMIOAccess mmio;
   StaticRAM wram(128 * 1024);
   StaticRAM apuram(64 * 1024);
+  StaticRAM echoram(64 * 1024);
   StaticRAM vram(64 * 1024);
   StaticRAM oam(544);
   StaticRAM cgram(512);

@@ -64,14 +64,14 @@ ProfileSettingsWindow::ProfileSettingsWindow() {
   } else {
     config().system.profile = "compatibility";
     profileCompatibility->setChecked(true);
-    QMessageBox::information(0, "First-Run Notice",
+  /*QMessageBox::information(0, "First-Run Notice",
       "<b>Note:</b> bsnes contains multiple emulation profiles.<br><br>"
       "If bsnes runs too slowly, you can greatly increase the speed by using the "
       "'Performance' profile; or if you want even more accuracy, you can use the "
       "'Accuracy' profile.<br><br>"
       "Feel free to experiment. You can select different profiles via:<br>"
       "Settings -> Configuration -> Profile"
-    );
+    );*/
   }
 
   connect(profileAccuracy, SIGNAL(pressed()), this, SLOT(setAccuracyProfile()));

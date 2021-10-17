@@ -1,0 +1,56 @@
+QWidget {
+  background: #2020a8;
+  color: #efefef;
+  font-family: "Courier New";
+  text-transform: uppercase;
+}
+
+QComboBox, QListView, QTreeWidget, QLineEdit {
+  background: #000000;
+  color: #00df00;
+}
+
+QCheckBox::indicator::unchecked {
+  image: url(resource/unchecked.png);
+}
+
+QCheckBox::indicator::checked {
+  image: url(resource/checked.png);
+}
+
+QRadioButton::indicator::unchecked {
+  image: url(resource/unselected.png);
+}
+
+QRadioButton::indicator::checked {
+  image: url(resource/selected.png);
+}
+
+QComboBox::drop-down {
+  border: 0px;
+}
+
+QComboBox::down-arrow {
+  image: url(resource/dropdown.png);
+}
+
+QTabBar::tab:selected {
+  color: #00df00;
+}
+
+QMenu {
+  background: #5a5d5a;
+}
+
+QMenu::item:selected {
+  background: #a50052;
+}
+
+QPushButton {
+  background: #6b698c;
+}
+
+QListView::item:selected, QTreeWidget::item:selected {
+  background: #a50052;
+  color: #00df00;
+}

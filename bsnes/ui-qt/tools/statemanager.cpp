@@ -78,12 +78,12 @@ void StateManagerWindow::update() {
     QTreeWidgetItem *item = items[i];
     unsigned n = item->data(0, Qt::UserRole).toUInt();
     if(isStateValid(n) == false) {
-      item->setForeground(0, QBrush(QColor(128, 128, 128)));
-      item->setForeground(1, QBrush(QColor(128, 128, 128)));
+      //item->setForeground(0, QBrush(QColor(128, 128, 128)));
+      //item->setForeground(1, QBrush(QColor(128, 128, 128)));
       item->setText(1, "Empty");
     } else {
-      item->setForeground(0, QBrush(QColor(0, 0, 0)));
-      item->setForeground(1, QBrush(QColor(0, 0, 0)));
+      //item->setForeground(0, QBrush(QColor(0, 0, 0)));
+      //item->setForeground(1, QBrush(QColor(0, 0, 0)));
       item->setText(1, getStateDescription(n));
     }
   }
