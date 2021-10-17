@@ -63,7 +63,7 @@ void InputMapper::Gamepad::create(const char *deviceName, const char *configName
 }
 
 int16_t InputMapper::Gamepad::poll(unsigned id) {
-  switch(id) {
+  switch((SNES::Input::JoypadID)id) {
     case SNES::Input::JoypadID::Up:     return up.poll();
     case SNES::Input::JoypadID::Down:   return down.poll() & !up.poll();
     case SNES::Input::JoypadID::Left:   return left.poll();
