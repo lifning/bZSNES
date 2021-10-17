@@ -32,6 +32,7 @@ endif
 
 obj/libco.o  : libco/libco.c libco/*
 obj/libretro.o: $(snes)/libretro/libretro.cpp $(snes)/libretro/*
+obj/libsnes.o: $(snes)/libsnes/libsnes.cpp $(snes)/libsnes/*
 
 obj/snes-system.o   : $(snes)/system/system.cpp $(call rwildcard,$(snes)/system/) $(call rwildcard,$(snes)/video/)
 obj/snes-memory.o   : $(snes)/memory/memory.cpp $(call rwildcard,$(snes)/memory/)
@@ -69,15 +70,15 @@ obj/snes-serial.o      : $(snes)/chip/serial/serial.cpp $(snes)/chip/serial/*
 
 snes_objects := $(patsubst %,obj/%.o,$(snes_objects))
 
-library: $(snes_objects) obj/libretro.o
+library: $(snes_objects) obj/libretro.o obj/libsnes.o
 ifeq ($(platform),x)
-	ar rcs out/libretro.a $(snes_objects) obj/libretro.o
-	$(cpp) -o out/libretro.so -shared -Wl,-soname,libretro.so.1 $(snes_objects) obj/libretro.o
+	ar rcs out/libretro.a $(snes_objects) obj/libretro.o obj/libsnes.o
+	$(cpp) -o out/libretro.so -shared -Wl,-soname,libretro.so.1 $(snes_objects) obj/libretro.o obj/libsnes.o
 else ifeq ($(platform),osx)
-	ar rcs out/libretro.a $(snes_objects) obj/libretro.o
-	$(cpp) -o out/libretro.dylib -install_name @executable_path/../Libraries/libretro.dylib -shared -dynamiclib $(snes_objects) obj/libretro.o
+	ar rcs out/libretro.a $(snes_objects) obj/libretro.o obj/libsnes.o
+	$(cpp) -o out/libretro.dylib -install_name @executable_path/../Libraries/libretro.dylib -shared -dynamiclib $(snes_objects) obj/libretro.o obj/libsnes.o
 else ifeq ($(platform),win)
-	$(cpp) -o out/snes.dll -shared -Wl,--out-implib,libretro.a $(snes_objects) obj/libretro.o
+	$(cpp) -o out/snes.dll -shared -Wl,--out-implib,libretro.a $(snes_objects) obj/libretro.o obj/libsnes.o
 endif
 
 library-install:
