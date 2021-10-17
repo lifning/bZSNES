@@ -1,7 +1,9 @@
 /* Global Headers */
 
 #if defined(VIDEO_QTOPENGL) || defined(VIDEO_QTRASTER)
-  #include <QApplication>
+  #include <QtWidgets/QApplication>
+  #include <QtWidgets/QVBoxLayout>
+  #include <QtWidgets/QWidget>
   #include <QtGui>
 #endif
 
