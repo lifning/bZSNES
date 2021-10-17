@@ -119,7 +119,13 @@ inline bool xml_element::parse_head(string data) {
   data.qreplace("\t", " ");
   data.qreplace("\r", " ");
   data.qreplace("\n", " ");
-  while(qstrpos(data, "  ")) data.qreplace("  ", " ");
+  // hack: returning optional<>s evidently does bad things to the stack on modern gcc,
+  // so this was reworked to not use qstrpos.
+  int len;
+  do {
+    len = data.length();
+    data.qreplace("  ", " ");
+  } while(len != data.length());
   data.qreplace(" =", "=");
   data.qreplace("= ", "=");
   data.rtrim();
@@ -134,7 +140,6 @@ inline bool xml_element::parse_head(string data) {
     lstring side;
     side.qsplit("=", part[i]);
     if(side.size() != 2) throw "...";
-
     xml_attribute attr;
     attr.name = side[0];
     attr.content = side[1];
