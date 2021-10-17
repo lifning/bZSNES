@@ -8,7 +8,7 @@
   #include "x86.c"
 #elif defined(__GNUC__) && defined(__amd64__)
   #include "amd64.c"
-#elif defined(__GNUC__) && defined(_ARCH_PPC)
+#elif defined(__GNUC__) && defined(_ARCH_PPC) && !defined(_LITTLE_ENDIAN)
   #include "ppc.c"
 #elif defined(__GNUC__)
   #include "sjlj.c"
