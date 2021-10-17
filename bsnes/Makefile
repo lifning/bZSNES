@@ -6,8 +6,9 @@ ui := ui-qt
 # compiler
 c       := $(compiler) -std=gnu99
 cpp     := $(subst cc,++,$(compiler)) -std=gnu++0x
-# hack: -O1 through -O3 crash in nall::vector destructor in xml parse
-flags   := -Os -fomit-frame-pointer -I. -I$(snes) -fPIC
+# hack: -O1 through -O3 crash in nall::vector destructor in xml parse.
+#  -Os survives on ppc64le, but not x86_64.
+flags   := -O0 -fomit-frame-pointer -I. -I$(snes) -fPIC
 link    :=
 objects :=
 
