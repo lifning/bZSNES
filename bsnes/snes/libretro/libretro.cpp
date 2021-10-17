@@ -106,8 +106,8 @@ unsigned retro_api_version(void) {
 }
 
 void retro_get_system_info(struct retro_system_info *info) {
-  info->library_name = "bZSNES";
-  info->library_version = "v1.51";
+  info->library_name = SNES::Info::Name;
+  info->library_version = SNES::Info::Version;
   info->valid_extensions = "sfc|smc";
   info->need_fullpath = false;
   info->block_extract = false;
