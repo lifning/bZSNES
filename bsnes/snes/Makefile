@@ -31,7 +31,7 @@ else ifeq ($(profile),performance)
 endif
 
 obj/libco.o  : libco/libco.c libco/*
-obj/libsnes.o: $(snes)/libsnes/libsnes.cpp $(snes)/libsnes/*
+obj/libretro.o: $(snes)/libretro/libretro.cpp $(snes)/libretro/*
 
 obj/snes-system.o   : $(snes)/system/system.cpp $(call rwildcard,$(snes)/system/) $(call rwildcard,$(snes)/video/)
 obj/snes-memory.o   : $(snes)/memory/memory.cpp $(call rwildcard,$(snes)/memory/)
@@ -69,30 +69,30 @@ obj/snes-serial.o      : $(snes)/chip/serial/serial.cpp $(snes)/chip/serial/*
 
 snes_objects := $(patsubst %,obj/%.o,$(snes_objects))
 
-library: $(snes_objects) obj/libsnes.o
+library: $(snes_objects) obj/libretro.o
 ifeq ($(platform),x)
-	ar rcs out/libsnes.a $(snes_objects) obj/libsnes.o
-	$(cpp) -o out/libsnes.so -shared -Wl,-soname,libsnes.so.1 $(snes_objects) obj/libsnes.o
+	ar rcs out/libretro.a $(snes_objects) obj/libretro.o
+	$(cpp) -o out/libretro.so -shared -Wl,-soname,libretro.so.1 $(snes_objects) obj/libretro.o
 else ifeq ($(platform),osx)
-	ar rcs out/libsnes.a $(snes_objects) obj/libsnes.o
-	$(cpp) -o out/libsnes.dylib -install_name @executable_path/../Libraries/libsnes.dylib -shared -dynamiclib $(snes_objects) obj/libsnes.o
+	ar rcs out/libretro.a $(snes_objects) obj/libretro.o
+	$(cpp) -o out/libretro.dylib -install_name @executable_path/../Libraries/libretro.dylib -shared -dynamiclib $(snes_objects) obj/libretro.o
 else ifeq ($(platform),win)
-	$(cpp) -o out/snes.dll -shared -Wl,--out-implib,libsnes.a $(snes_objects) obj/libsnes.o
+	$(cpp) -o out/snes.dll -shared -Wl,--out-implib,libretro.a $(snes_objects) obj/libretro.o
 endif
 
 library-install:
 ifeq ($(platform),x)
-	install -D -m 755 out/libsnes.a $(DESTDIR)$(prefix)/lib/libsnes.a
-	install -D -m 755 out/libsnes.so $(DESTDIR)$(prefix)/lib/libsnes.so
+	install -D -m 755 out/libretro.a $(DESTDIR)$(prefix)/lib/libretro.a
+	install -D -m 755 out/libretro.so $(DESTDIR)$(prefix)/lib/libretro.so
 	ldconfig -n $(DESTDIR)$(prefix)/lib
 else ifeq ($(platform),osx)
-	cp out/libsnes.dylib /usr/local/lib/libsnes.dylib
+	cp out/libretro.dylib /usr/local/lib/libretro.dylib
 endif
 
 library-uninstall:
 ifeq ($(platform),x)
-	rm $(DESTDIR)$(prefix)/lib/libsnes.a
-	rm $(DESTDIR)$(prefix)/lib/libsnes.so
+	rm $(DESTDIR)$(prefix)/lib/libretro.a
+	rm $(DESTDIR)$(prefix)/lib/libretro.so
 else ifeq ($(platform),osx)
-	rm /usr/local/lib/libsnes.dylib
+	rm /usr/local/lib/libretro.dylib
 endif
