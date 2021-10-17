@@ -13,6 +13,15 @@ extern "C" {
 #define RETRO_DEVICE_MOUSE        2
 #define RETRO_DEVICE_LIGHTGUN     4
 
+// Special (SNES-specific) device subtypes
+#define RETRO_DEVICE_TYPE_SHIFT         8
+#define RETRO_DEVICE_MASK               ((1 << RETRO_DEVICE_TYPE_SHIFT) - 1)
+#define RETRO_DEVICE_SUBCLASS(base, id) (((id + 1) << RETRO_DEVICE_TYPE_SHIFT) | base)
+#define RETRO_DEVICE_JOYPAD_MULTITAP       RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 0)
+#define RETRO_DEVICE_LIGHTGUN_SUPER_SCOPE  RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_LIGHTGUN, 0)
+#define RETRO_DEVICE_LIGHTGUN_JUSTIFIER    RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_LIGHTGUN, 1)
+#define RETRO_DEVICE_LIGHTGUN_JUSTIFIERS   RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_LIGHTGUN, 2)
+
 #define RETRO_DEVICE_ID_JOYPAD_B        0
 #define RETRO_DEVICE_ID_JOYPAD_Y        1
 #define RETRO_DEVICE_ID_JOYPAD_SELECT   2
@@ -45,6 +54,21 @@ extern "C" {
 #define RETRO_MEMORY_RTC                 1
 #define RETRO_MEMORY_SYSTEM_RAM          2
 #define RETRO_MEMORY_VIDEO_RAM           3
+
+// Special (SNES-specific) memory types.
+#define RETRO_MEMORY_SNES_BSX_RAM             ((1 << 8) | RETRO_MEMORY_SAVE_RAM)
+#define RETRO_MEMORY_SNES_BSX_PRAM            ((2 << 8) | RETRO_MEMORY_SAVE_RAM)
+#define RETRO_MEMORY_SNES_SUFAMI_TURBO_A_RAM  ((3 << 8) | RETRO_MEMORY_SAVE_RAM)
+#define RETRO_MEMORY_SNES_SUFAMI_TURBO_B_RAM  ((4 << 8) | RETRO_MEMORY_SAVE_RAM)
+#define RETRO_MEMORY_SNES_GAME_BOY_RAM        ((5 << 8) | RETRO_MEMORY_SAVE_RAM)
+#define RETRO_MEMORY_SNES_GAME_BOY_RTC        ((6 << 8) | RETRO_MEMORY_RTC)
+
+// Special (SNES-specific) game types passed into retro_load_game_special().
+// Only used when multiple ROMs are required.
+#define RETRO_GAME_TYPE_BSX             0x101
+#define RETRO_GAME_TYPE_BSX_SLOTTED     0x102
+#define RETRO_GAME_TYPE_SUFAMI_TURBO    0x103
+#define RETRO_GAME_TYPE_SUPER_GAME_BOY  0x104
 
 struct retro_game_info
 {
@@ -130,7 +154,7 @@ bool retro_load_game_special(
 
 void retro_unload_game(void);
 
-bool retro_get_region(void);
+unsigned retro_get_region(void);
 void* retro_get_memory_data(unsigned id);
 unsigned retro_get_memory_size(unsigned id);
 

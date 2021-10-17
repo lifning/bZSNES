@@ -1,31 +1,53 @@
 #include "libretro.hpp"
+#include <libsnes/libsnes.hpp>
 #include <snes.hpp>
 
 #include <nall/snes/info.hpp>
 using namespace nall;
 
 namespace {
-  SNES::Input::Device retro_to_snes_device_id(unsigned id) {
+  SNES::Input::Device retro_to_snes_device_type(unsigned id) {
     switch(id) {
       case RETRO_DEVICE_NONE: return SNES::Input::Device::None;
       case RETRO_DEVICE_JOYPAD: return SNES::Input::Device::Joypad;
       case RETRO_DEVICE_MOUSE: return SNES::Input::Device::Mouse;
-      case RETRO_DEVICE_LIGHTGUN: return SNES::Input::Device::SuperScope;
+      case RETRO_DEVICE_JOYPAD_MULTITAP: return SNES::Input::Device::Multitap;
+      case RETRO_DEVICE_LIGHTGUN:
+      case RETRO_DEVICE_LIGHTGUN_SUPER_SCOPE:
+        return SNES::Input::Device::SuperScope;
+      case RETRO_DEVICE_LIGHTGUN_JUSTIFIER: return SNES::Input::Device::Justifier;
+      case RETRO_DEVICE_LIGHTGUN_JUSTIFIERS: return SNES::Input::Device::Justifiers;
       default: return SNES::Input::Device::None;
     }
   }
-  unsigned snes_to_retro_device_id(SNES::Input::Device id) {
+  unsigned snes_to_retro_device_type(SNES::Input::Device id) {
     switch(id) {
       case SNES::Input::Device::None: return RETRO_DEVICE_NONE;
       case SNES::Input::Device::Joypad: return RETRO_DEVICE_JOYPAD;
       case SNES::Input::Device::Mouse: return RETRO_DEVICE_MOUSE;
-      case SNES::Input::Device::SuperScope: return RETRO_DEVICE_LIGHTGUN;
+      case SNES::Input::Device::Multitap: return RETRO_DEVICE_JOYPAD_MULTITAP;
+      case SNES::Input::Device::SuperScope: return RETRO_DEVICE_LIGHTGUN_SUPER_SCOPE;
+      case SNES::Input::Device::Justifier: return RETRO_DEVICE_LIGHTGUN_JUSTIFIER;
+      case SNES::Input::Device::Justifiers: return RETRO_DEVICE_LIGHTGUN_JUSTIFIERS;
       default: return RETRO_DEVICE_NONE;
+    }
+  }
+  unsigned retro_to_snes_memory_id(unsigned id) {
+    switch(id) {
+      case RETRO_MEMORY_SAVE_RAM: return SNES_MEMORY_CARTRIDGE_RAM;
+      case RETRO_MEMORY_RTC: return SNES_MEMORY_CARTRIDGE_RTC;
+      case RETRO_MEMORY_SNES_BSX_RAM: return SNES_MEMORY_BSX_RAM;
+      case RETRO_MEMORY_SNES_BSX_PRAM: return SNES_MEMORY_BSX_PRAM;
+      case RETRO_MEMORY_SNES_SUFAMI_TURBO_A_RAM: return SNES_MEMORY_SUFAMI_TURBO_A_RAM;
+      case RETRO_MEMORY_SNES_SUFAMI_TURBO_B_RAM: return SNES_MEMORY_SUFAMI_TURBO_B_RAM;
+      case RETRO_MEMORY_SNES_GAME_BOY_RAM: return SNES_MEMORY_GAME_BOY_RAM;
+      case RETRO_MEMORY_SNES_GAME_BOY_RTC: return SNES_MEMORY_GAME_BOY_RTC;
+      default: return -1U;
     }
   }
 }
 
-struct Interface : public SNES::Interface {
+struct RetroInterface : public SNES::Interface {
   retro_video_refresh_t pvideo_refresh;
   retro_audio_sample_t paudio_sample;
   retro_audio_sample_batch_t paudio_sample_batch;
@@ -53,15 +75,15 @@ struct Interface : public SNES::Interface {
   }
 
   int16_t input_poll(bool port, SNES::Input::Device device, unsigned index, unsigned id) {
-    if(pinput_state) return pinput_state(port, snes_to_retro_device_id(device), index, id);
+    if(pinput_state) return pinput_state(port, snes_to_retro_device_type(device), index, id);
     return 0;
   }
 
-  Interface() : pvideo_refresh(0), paudio_sample(0), paudio_sample_batch(0), pinput_poll(0), pinput_state(0) {
+  RetroInterface() : pvideo_refresh(0), paudio_sample(0), paudio_sample_batch(0), pinput_poll(0), pinput_state(0) {
   }
 };
 
-static Interface interface;
+static RetroInterface interface;
 
 void retro_set_environment(retro_environment_t environment) {
   (void)environment;
@@ -88,17 +110,7 @@ void retro_set_input_state(retro_input_state_t input_state) {
 }
 
 void retro_set_controller_port_device(bool port, unsigned device) {
-  SNES::input.port_set_device(port, retro_to_snes_device_id(device));
-}
-
-void retro_init(void) {
-  SNES::system.init(&interface);
-  SNES::input.port_set_device(0, SNES::Input::Device::Joypad);
-  SNES::input.port_set_device(1, SNES::Input::Device::Joypad);
-}
-
-void retro_deinit(void) {
-  SNES::system.term();
+  SNES::input.port_set_device(port, retro_to_snes_device_type(device));
 }
 
 unsigned retro_api_version(void) {
@@ -123,84 +135,51 @@ void retro_get_system_av_info(struct retro_system_av_info *info) {
   info->geometry.aspect_ratio = 8.0 / 7.0;
 }
 
-void retro_reset(void) {
-  SNES::system.reset();
-}
-
-void retro_run(void) {
-  SNES::system.run();
-}
-
-unsigned retro_serialize_size(void) {
-  return SNES::system.serialize_size();
-}
-
-bool retro_serialize(void *data, unsigned size) {
-  SNES::system.runtosave();
-  serializer s = SNES::system.serialize();
-  if(s.size() > size) return false;
-  memcpy(data, s.data(), s.size());
-  return true;
-}
-
-bool retro_unserialize(const void *data, unsigned size) {
-  serializer s((uint8_t*)data, size);
-  return SNES::system.unserialize(s);
-}
-
-void retro_cheat_reset(void) {
-  SNES::cheat.reset();
-  SNES::cheat.synchronize();
-}
-
-void retro_cheat_set(unsigned index, bool enabled, const char *code) {
-  SNES::cheat[index] = code;
-  SNES::cheat[index].enabled = enabled;
-  SNES::cheat.synchronize();
-}
-
-bool retro_load_game(
-  const struct retro_game_info *game
-) {
-  retro_cheat_reset();
-  if(game->data) SNES::memory::cartrom.copy((uint8_t*)game->data, game->size);
-  string xmlrom = (game->meta && *(game->meta)) ? string(game->meta) : snes_information((uint8_t*)game->data, game->size).xml_memory_map;
-  SNES::cartridge.load(SNES::Cartridge::Mode::Normal, { xmlrom });
-  SNES::system.power();
-  return true;
-}
-
 bool retro_load_game_special(
   unsigned game_type,
   const struct retro_game_info *info, size_t num_info
 ) {
-  return false;
-}
-
-void retro_unload_game(void) {
-  SNES::cartridge.unload();
-}
-
-bool retro_get_region(void) {
-  return SNES::system.region() == SNES::System::Region::NTSC ? 0 : 1;
+  switch (game_type) {
+    case RETRO_GAME_TYPE_BSX:
+      if (num_info != 2) return false;
+      return snes_load_cartridge_bsx(
+        info[0].meta, (uint8_t*)info[0].data, info[0].size,
+        info[1].meta, (uint8_t*)info[1].data, info[1].size
+      );
+    case RETRO_GAME_TYPE_BSX_SLOTTED:
+      if (num_info != 2) return false;
+      return snes_load_cartridge_bsx_slotted(
+        info[0].meta, (uint8_t*)info[0].data, info[0].size,
+        info[1].meta, (uint8_t*)info[1].data, info[1].size
+      );
+    case RETRO_GAME_TYPE_SUPER_GAME_BOY:
+      if (num_info != 2) return false;
+      return snes_load_cartridge_super_game_boy(
+        info[0].meta, (uint8_t*)info[0].data, info[0].size,
+        info[1].meta, (uint8_t*)info[1].data, info[1].size
+      );
+    case RETRO_GAME_TYPE_SUFAMI_TURBO:
+      if (num_info != 2) return false;
+      return snes_load_cartridge_sufami_turbo(
+        info[0].meta, (uint8_t*)info[0].data, info[0].size,
+        info[1].meta, (uint8_t*)info[1].data, info[1].size,
+        info[2].meta, (uint8_t*)info[2].data, info[2].size
+      );
+    default: return false;
+  }
 }
 
 void* retro_get_memory_data(unsigned id) {
   if(SNES::cartridge.loaded() == false) return 0;
 
   switch(id) {
-    case RETRO_MEMORY_SAVE_RAM:
-      return SNES::memory::cartram.data();
-    case RETRO_MEMORY_RTC:
-      return SNES::memory::cartrtc.data();
     case RETRO_MEMORY_SYSTEM_RAM:
       return SNES::memory::wram.data();
     case RETRO_MEMORY_VIDEO_RAM:
       return SNES::memory::vram.data();
-    default:break;
+    default:
+      return snes_get_memory_data(retro_to_snes_memory_id(id));
   }
-
-  return 0;
 }
 
 unsigned retro_get_memory_size(unsigned id) {
@@ -208,20 +187,38 @@ unsigned retro_get_memory_size(unsigned id) {
   unsigned size = 0;
 
   switch(id) {
-    case RETRO_MEMORY_SAVE_RAM:
-      size = SNES::memory::cartram.size();
-      break;
-    case RETRO_MEMORY_RTC:
-      size = SNES::memory::cartrtc.size();
-      break;
-    case RETRO_MEMORY_SYSTEM_RAM:
-      size = SNES::memory::wram.size();
-      break;
-    case RETRO_MEMORY_VIDEO_RAM:
-      size = SNES::memory::vram.size();
-      break;
+    case RETRO_MEMORY_SYSTEM_RAM: size = SNES::memory::wram.size(); break;
+    case RETRO_MEMORY_VIDEO_RAM: size = SNES::memory::vram.size(); break;
+    default: return snes_get_memory_size(retro_to_snes_memory_id(id));
   }
 
   if(size == -1U) size = 0;
   return size;
 }
+
+// undifferentiated stubs from libsnes:
+
+void retro_init(void) { return snes_init(); }
+void retro_deinit(void) { return snes_term(); }
+void retro_reset(void) { return snes_reset(); }
+void retro_run(void) { return snes_run(); }
+
+unsigned retro_serialize_size(void) { return snes_serialize_size(); }
+bool retro_serialize(void *data, unsigned size) {
+  return snes_serialize((uint8_t*)data, size);
+}
+bool retro_unserialize(const void *data, unsigned size) {
+  return snes_unserialize((uint8_t*)data, size);
+}
+
+void retro_cheat_reset(void) { return snes_cheat_reset(); }
+void retro_cheat_set(unsigned index, bool enabled, const char *code) {
+  return snes_cheat_set(index, enabled, code);
+}
+
+bool retro_load_game(const struct retro_game_info *game) {
+  return snes_load_cartridge_normal(game->meta, (uint8_t*)game->data, game->size);
+}
+
+void retro_unload_game(void) { return snes_unload_cartridge(); }
+unsigned retro_get_region(void) { return snes_get_region(); }
