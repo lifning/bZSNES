@@ -1,10 +1,15 @@
-Posted by Near on April 1st, 2011:
+# Building
+In the `bsnes` subdirectory, run:
+- `make library` to build the combination libsnes+libretro (yes, it still works in old SSNES builds and other libsnes frontends if you have some reason to want that).
+- `make ui=ui-phoenix` to build the Phoenix/GTK+2 frontend.
+- `make` to build the Qt5 frontend.
 
+##### Posted by Near on April 1st, 2011:
 > # About
 > bZSNES is a portable ZSNES emulator for Windows, OS X and Linux; written in C++. It is licensed under the GNU GPLv2.
 > 
 > # Features
-> - bZSNES emulates almost all of the major features of ZSNES:
+> bZSNES emulates almost all of the major features of ZSNES:
 > - VRAM can be written at any time, even while screen is rendering
 > - OAM and CGRAM can also be written at any time
 > - DSP echo buffer writes do not interfere with APURAM
@@ -16,6 +21,7 @@ Posted by Near on April 1st, 2011:
 > - PPU background and sprite layers can be individually toggled on and off
 > - DSP voice channels can be individually toggled on and off
 > - CPU speed can be adjusted from its official frequency
+>
 > ... and more!
 > 
 > # Compatibility
@@ -24,6 +30,7 @@ Posted by Near on April 1st, 2011:
 > - Bahamut Lagoon [English translation]
 > - Sailor Moon: Another Story [English translation]
 > - Super Mario World [Addmusic hacks]
+>
 > ... and much more!
 > 
 > # Look & Feel
