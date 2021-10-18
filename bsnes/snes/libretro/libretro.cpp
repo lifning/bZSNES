@@ -53,20 +53,28 @@ struct RetroInterface : public SNES::Interface {
   retro_audio_sample_batch_t paudio_sample_batch;
   retro_input_poll_t pinput_poll;
   retro_input_state_t pinput_state;
+  const static size_t SAMPLE_BUFFER_SIZE = 32040/60;
+  int16_t sample_buffer[SAMPLE_BUFFER_SIZE];
+  size_t sample_buffer_index;
 
   void video_refresh(const uint16_t *data, unsigned width, unsigned height) {
     if(pvideo_refresh) {
-      unsigned pitch = (height <= 239) ? 1024 : 512;
+      // from SSNES lines_to_pitch
+      unsigned pitch = ((height == 448) || (height == 478)) ? 1024 : 2048;
       return pvideo_refresh(data, width, height, pitch);
     }
   }
 
   void audio_sample(uint16_t left, uint16_t right) {
-    if(paudio_sample) {
+    if(paudio_sample && !paudio_sample_batch) {
       paudio_sample((int16_t)left, (int16_t)right);
     } else if(paudio_sample_batch) {
-      const int16_t samples[2] = { (int16_t)left, (int16_t)right };
-      paudio_sample_batch(samples, 1);
+      sample_buffer[sample_buffer_index++] = (int16_t)left;
+      sample_buffer[sample_buffer_index++] = (int16_t)right;
+      if (sample_buffer_index >= SAMPLE_BUFFER_SIZE) {
+        sample_buffer_index = 0;
+        paudio_sample_batch(sample_buffer, SAMPLE_BUFFER_SIZE/2);
+      }
     }
   }
 
@@ -79,38 +87,44 @@ struct RetroInterface : public SNES::Interface {
     return 0;
   }
 
-  RetroInterface() : pvideo_refresh(0), paudio_sample(0), paudio_sample_batch(0), pinput_poll(0), pinput_state(0) {
+  RetroInterface() : pvideo_refresh(0), paudio_sample(0), paudio_sample_batch(0), pinput_poll(0), pinput_state(0), sample_buffer_index(0) {
   }
 };
 
-static RetroInterface interface;
+static RetroInterface retroInterface;
 
 void retro_set_environment(retro_environment_t environment) {
   (void)environment;
 }
 
 void retro_set_video_refresh(retro_video_refresh_t video_refresh) {
-  interface.pvideo_refresh = video_refresh;
+  retroInterface.pvideo_refresh = video_refresh;
 }
 
 void retro_set_audio_sample(retro_audio_sample_t audio_sample) {
-  interface.paudio_sample = audio_sample;
+  retroInterface.paudio_sample = audio_sample;
 }
 
 void retro_set_audio_sample_batch(retro_audio_sample_batch_t audio_sample_batch) {
-  interface.paudio_sample_batch = audio_sample_batch;
+  retroInterface.paudio_sample_batch = audio_sample_batch;
 }
 
 void retro_set_input_poll(retro_input_poll_t input_poll) {
-  interface.pinput_poll = input_poll;
+  retroInterface.pinput_poll = input_poll;
 }
 
 void retro_set_input_state(retro_input_state_t input_state) {
-  interface.pinput_state = input_state;
+  retroInterface.pinput_state = input_state;
 }
 
 void retro_set_controller_port_device(bool port, unsigned device) {
   SNES::input.port_set_device(port, retro_to_snes_device_type(device));
+}
+
+void retro_init(void) {
+  SNES::system.init(&retroInterface);
+  SNES::input.port_set_device(0, SNES::Input::Device::Joypad);
+  SNES::input.port_set_device(1, SNES::Input::Device::Joypad);
 }
 
 unsigned retro_api_version(void) {
@@ -120,7 +134,7 @@ unsigned retro_api_version(void) {
 void retro_get_system_info(struct retro_system_info *info) {
   info->library_name = SNES::Info::Name;
   info->library_version = SNES::Info::Version;
-  info->valid_extensions = "sfc|smc";
+  info->valid_extensions = "sfc";
   info->need_fullpath = false;
   info->block_extract = false;
 }
@@ -198,7 +212,6 @@ unsigned retro_get_memory_size(unsigned id) {
 
 // undifferentiated stubs from libsnes:
 
-void retro_init(void) { return snes_init(); }
 void retro_deinit(void) { return snes_term(); }
 void retro_reset(void) { return snes_reset(); }
 void retro_run(void) { return snes_run(); }
