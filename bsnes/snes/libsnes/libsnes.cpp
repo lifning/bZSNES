@@ -33,6 +33,14 @@ struct Interface : public SNES::Interface {
 
 static Interface interface;
 
+const char* snes_library_id(void) {
+  return SNES::Info::Name;
+}
+
+void snes_set_cartridge_basename(const char *basename) {
+  (void)basename;
+}
+
 unsigned snes_library_revision_major(void) {
   return 1;
 }
