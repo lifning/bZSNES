@@ -1,3 +1,8 @@
+# Why?
+It could potentially be useful as a tool for fixing *some* older homebrew/hacks that don't work outside of ZSNES, by serving as living-code documentation of [why](https://github.com/lifning/bZSNES/commit/e05af67ebdaf43e9f3a4b772d30587da1ebd32d3) they might be broken.
+It's also possible that it could be useful to *run* such things on hardware that isn't capable of running 32-bit x86 code.
+But mostly, because I found their joke hilarious ten years ago, and wanted to preserve it better than what little I was able to find on the web today.
+
 # Building
 In the `bsnes` subdirectory, run:
 - `make library` to build the combination libsnes+libretro (yes, it still works in old SSNES builds and other libsnes frontends if you have some reason to want that).
